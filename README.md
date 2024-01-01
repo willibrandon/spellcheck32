@@ -2,14 +2,14 @@
 
 A .NET wrapper around the Microsoft Spell Checking API.
 
-```cs
+```csharp
 using SpellChecker spellChecker = new("en-US");
-spellChecker.AutoCorrect(from: "Linux", to: "Windows");
+spellChecker.AutoCorrect("Linux", "Windows");
 
 string text = "Cann I I haev some Linux?";
 Console.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
-foreach (SpellingError spellingError in spellChecker.Check(text: text))
+foreach (SpellingError spellingError in spellChecker.Check(text))
 {
     string misspelledWord = text.Substring((int)spellingError.StartIndex, (int)spellingError.Length);
 
@@ -22,7 +22,7 @@ foreach (SpellingError spellingError in spellChecker.Check(text: text))
         case CorrectiveAction.GetSuggestions:
             Console.WriteLine(string.Concat("Suggest replacing \"", misspelledWord, "\" with:"));
 
-            foreach (string suggestion in spellChecker.Suggest(word: misspelledWord))
+            foreach (string suggestion in spellChecker.Suggest(misspelledWord))
             {
                 Console.WriteLine(string.Concat("\"", suggestion, "\""));
             }
@@ -33,7 +33,7 @@ foreach (SpellingError spellingError in spellChecker.Check(text: text))
         case CorrectiveAction.Replace:
             Console.WriteLine(
                 string.Concat("Replace \"", misspelledWord, "\" with \"",
-                    spellChecker.Suggest(word: misspelledWord).First(), "\"", Environment.NewLine));
+                    spellChecker.Suggest(misspelledWord).First(), "\"", Environment.NewLine));
             break;
 
         case CorrectiveAction.None:

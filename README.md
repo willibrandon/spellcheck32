@@ -4,12 +4,12 @@ A .NET wrapper around the Microsoft Spell Checking API.
 
 ```cs
 using SpellChecker spellChecker = new("en-US");
-spellChecker.AutoCorrect("Linux", "Windows");
+spellChecker.AutoCorrect(from: "Linux", to: "Windows");
 
 string text = "Cann I I haev some Linux?";
 Console.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
-foreach (SpellingError spellingError in spellChecker.Check(text))
+foreach (SpellingError spellingError in spellChecker.Check(text: text))
 {
     string misspelledWord = text.Substring((int)spellingError.StartIndex, (int)spellingError.Length);
 
@@ -22,7 +22,7 @@ foreach (SpellingError spellingError in spellChecker.Check(text))
         case CorrectiveAction.GetSuggestions:
             Console.WriteLine(string.Concat("Suggest replacing \"", misspelledWord, "\" with:"));
 
-            foreach (string suggestion in spellChecker.Suggest(misspelledWord))
+            foreach (string suggestion in spellChecker.Suggest(word: misspelledWord))
             {
                 Console.WriteLine(string.Concat("\"", suggestion, "\""));
             }
@@ -33,7 +33,7 @@ foreach (SpellingError spellingError in spellChecker.Check(text))
         case CorrectiveAction.Replace:
             Console.WriteLine(
                 string.Concat("Replace \"", misspelledWord, "\" with \"",
-                    spellChecker.Suggest(misspelledWord).First(), "\"", Environment.NewLine));
+                    spellChecker.Suggest(word: misspelledWord).First(), "\"", Environment.NewLine));
             break;
 
         case CorrectiveAction.None:

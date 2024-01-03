@@ -17,19 +17,27 @@ namespace spellcheck32;
 ///  dictionary, or from the ignore list.
 /// </para>
 /// <para>
-///  The <see cref="SpellChecker"/> can also be used to check text, get suggestions, update user directories, and maintain
-///  options.
+///  The <see cref="SpellChecker"/> can also be used to check text, get suggestions, and maintain settings and user dictionaries.
+/// </para>
+/// <para>
+///  The user-specific dictionaries for a language, which hold the content for the Added, Excluded, and AutoCorrect word lists,
+///  are located under %AppData%\Microsoft\Spelling\&lt;language tag&gt;. The filenames are default.dic (Added), default.exc (Excluded)
+///  and default.acl (AutoCorrect). The files are UTF-16 LE plaintext that must start with the appropriate Byte Order Mark (BOM).
+///  Each line contains a word (in the Added and Excluded word lists), or an autocorrect pair with the words separated by a
+///  vertical bar ("|") (in the AutoCorrect word list). Other .dic, .exc, and .acl files present in the directory will be
+///  detected by the spell checking service and added to the user word lists. These files are considered to be read-only and are
+///  not modified by the spell checking API.
 /// </para>
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
     private bool _disposedValue;
     private readonly uint _eventCookie;
-    private readonly ISpellCheckerChangedEventHandler? _handler;
+    private readonly ISpellCheckerChangedEventHandler _handler;
     private readonly string _languageTag;
-    private IUserDictionariesRegistrar? _registrar;
-    private ISpellChecker2? _spellChecker;
-    private ISpellCheckerFactory? _spellCheckFactory;
+    private IUserDictionariesRegistrar _registrar;
+    private ISpellChecker2 _spellChecker;
+    private ISpellCheckerFactory _spellCheckFactory;
 
     /// <summary>
     ///  Occurs when there is a change to the state of the spell checker that could cause the text to be treated differently. A
@@ -94,7 +102,7 @@ public partial class SpellChecker : IDisposable
             if (_registrar is not null)
             {
                 Marshal.ReleaseComObject(_registrar);
-                _registrar = null;
+                _registrar = null!;
             }
 
             if (_spellChecker is not null)
@@ -105,13 +113,13 @@ public partial class SpellChecker : IDisposable
                 }
 
                 Marshal.ReleaseComObject(_spellChecker);
-                _spellChecker = null;
+                _spellChecker = null!;
             }
 
             if (_spellCheckFactory is not null)
             {
                 Marshal.ReleaseComObject(_spellCheckFactory);
-                _spellCheckFactory = null;
+                _spellCheckFactory = null!;
             }
 
             _disposedValue = true;
@@ -220,41 +228,6 @@ public partial class SpellChecker : IDisposable
     /// </returns>
     public bool IsLanguageSupported(string languageTag) => _spellCheckFactory.IsSupported(languageTag);
 
-    public IEnumerable<SpellCheckOption> Options()
-    {
-        IEnumString? optionIds = _spellChecker?.OptionIds;
-
-        try
-        {
-            while (EnumerateStrings(optionIds, out string optionId))
-            {
-                IOptionDescription optionDescription = _spellChecker.GetOptionDescription(optionId);
-                IEnumString labelStrings = optionDescription.Labels;
-                List<string> labels = [];
-
-                while (EnumerateStrings(labelStrings, out string labelString))
-                {
-                    labels.Add(labelString);
-                }
-
-                yield return new SpellCheckOption()
-                {
-                    Description = optionDescription.Description.ToString(),
-                    Heading = optionDescription.Heading.ToString(),
-                    Identifier = optionDescription.Id.ToString(),
-                    Labels = labels
-                };
-            }
-        }
-        finally
-        {
-            if (optionIds is not null)
-            {
-                Marshal.ReleaseComObject(optionIds);
-            }
-        }
-    }
-
     /// <summary>
     ///  Registers a file to be used as a user dictionary for the current user, until unregistered.
     /// </summary>
@@ -314,7 +287,7 @@ public partial class SpellChecker : IDisposable
     /// </summary>
     public IEnumerable<string> SupportedLanguages()
     {
-        IEnumString? supportedLanguages = _spellCheckFactory?.SupportedLanguages;
+        IEnumString supportedLanguages = _spellCheckFactory.SupportedLanguages;
 
         try
         {
@@ -353,29 +326,33 @@ public partial class SpellChecker : IDisposable
     /// <summary>
     ///  Retrieves the next string in the enumeration sequence.
     /// </summary>
-    private bool EnumerateStrings(IEnumString? strings, out string next)
+    private bool EnumerateStrings(IEnumString strings, out string nextString)
     {
+        nextString = string.Empty;
+
         if (strings is null)
         {
-            next = string.Empty;
             return false;
         }
 
-        Span<PWSTR> nextSpan = null;
-        PWSTR nextString = null;
-        HRESULT result;
-
+        uint numStrings = 1;
+        PWSTR[] stringArray = new PWSTR[numStrings];
+        
         unsafe
         {
-            fixed (char* pNext = next)
+            fixed (PWSTR* pNextString = stringArray)
             {
-                nextString = new(value: pNext);
-                nextSpan = new Span<PWSTR>(pointer: &nextString, length: 1);
-                result = strings.Next(nextSpan, null);
+                uint fetched;
+                HRESULT result = strings.Next(numStrings, pNextString, &fetched);
+
+                if (result.Succeeded && fetched > 0 && stringArray.Length > 0)
+                {
+                    nextString = stringArray[0].ToString();
+                    PInvoke.CoTaskMemFree(stringArray[0]);
+                }
             }
         }
 
-        next = nextSpan.Length > 0 ? nextSpan[0].ToString() : string.Empty;
-        return result.Succeeded && !string.IsNullOrWhiteSpace(next);
+        return !string.IsNullOrWhiteSpace(nextString);
     }
 }

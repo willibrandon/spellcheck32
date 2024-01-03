@@ -7,6 +7,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Data\en_US.dic" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Data\en_US.dic">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
 	    <PrivateAssets>all</PrivateAssets>
 	  </PackageReference>

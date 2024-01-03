@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -31,6 +32,10 @@ namespace spellcheck32;
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
+    private const string DataDirectory = "Data";
+    private const string US_English = "en-US";
+    private const string US_English_Dictionary = "en_US.dic";
+
     private bool _disposedValue;
     private readonly uint _eventCookie;
     private readonly ISpellCheckerChangedEventHandler _handler;
@@ -38,6 +43,7 @@ public partial class SpellChecker : IDisposable
     private IUserDictionariesRegistrar _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
+    private readonly string _userDictionaryPath;
 
     /// <summary>
     ///  Occurs when there is a change to the state of the spell checker that could cause the text to be treated differently. A
@@ -85,6 +91,30 @@ public partial class SpellChecker : IDisposable
         _handler = new SpellCheckEvents(this);
         _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
         _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
+        _userDictionaryPath = string.Empty;
+
+        if (_languageTag == US_English)
+        {
+            string englishDictionary = Path.Combine(
+                Path.GetFullPath(DataDirectory),
+                US_English_Dictionary);
+
+            if (File.Exists(englishDictionary))
+            {
+                _userDictionaryPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Microsoft",
+                    "Spelling",
+                    _languageTag,
+                    Path.GetFileName(englishDictionary));
+                File.Copy(englishDictionary, _userDictionaryPath, true);
+
+                if (File.Exists(_userDictionaryPath))
+                {
+                    RegisterUserDictionary(_userDictionaryPath, _languageTag);
+                }
+            }
+        }
     }
 
     ~SpellChecker() => Dispose(false);

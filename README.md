@@ -47,26 +47,11 @@ Output:
 ```
 Check "Cann I I haev some Linux?"
 
-Suggest replacing "Cann" with:
-"Canny"
-"Canon"
-"Canin"
-"Conn"
-"CNN"
-"Cant"
-"Cahn"
-"Cano"
-"Cain"
-"Cen"
+Replace "Cann" with "Can"
 
 Delete "I"
 
-Suggest replacing "haev" with:
-"heave"
-"hive"
-"haven"
-"hove"
-"haves"
+Replace "haev" with "have"
 
 Replace "Linux" with "Windows"
 ```

@@ -7,11 +7,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Spelling\en_US.dic" />
+	  <None Remove="Dictionary\en_US.dic" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Spelling\en_US.dic">
+	  <EmbeddedResource Include="Dictionary\en_US.dic">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>

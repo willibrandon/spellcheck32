@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -32,10 +33,12 @@ namespace spellcheck32;
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
+    private const string Dictionary = "Dictionary";
+    private const string SpellCheck32 = "spellcheck32";
     private const string Spelling = "Spelling";
     private const string USEnglish = "en-US";
     private const string USEnglishDictionary = "en_US.dic";
-    private const string USEnglishResource = "spellcheck32.Spelling." + USEnglishDictionary;
+    private const string USEnglishResource = $"{SpellCheck32}.{Dictionary}.{USEnglishDictionary}";
 
     private bool _disposedValue;
     private readonly uint _eventCookie;
@@ -403,7 +406,7 @@ public partial class SpellChecker : IDisposable
 
     private void WriteResourceToFile(string resourceName, string fileName)
     {
-        using Stream resourceStream = GetType().Assembly.GetManifestResourceStream(resourceName);
+        using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
         resourceStream.CopyTo(fileStream);
     }

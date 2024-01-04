@@ -1,6 +1,6 @@
 # spellcheck32
 
-A .NET wrapper around the Microsoft Spell Checking API.
+Usage.
 
 ```csharp
 using SpellChecker spellChecker = new("en-US");

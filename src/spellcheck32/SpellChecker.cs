@@ -32,9 +32,10 @@ namespace spellcheck32;
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
-    private const string DataDirectory = "Data";
-    private const string US_English = "en-US";
-    private const string US_English_Dictionary = "en_US.dic";
+    private const string Spelling = "Spelling";
+    private const string USEnglish = "en-US";
+    private const string USEnglishDictionary = "en_US.dic";
+    private const string USEnglishResource = "spellcheck32.Spelling." + USEnglishDictionary;
 
     private bool _disposedValue;
     private readonly uint _eventCookie;
@@ -43,7 +44,6 @@ public partial class SpellChecker : IDisposable
     private IUserDictionariesRegistrar _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
-    private readonly string _userDictionaryPath;
 
     /// <summary>
     ///  Occurs when there is a change to the state of the spell checker that could cause the text to be treated differently. A
@@ -91,28 +91,21 @@ public partial class SpellChecker : IDisposable
         _handler = new SpellCheckEvents(this);
         _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
         _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
-        _userDictionaryPath = string.Empty;
 
-        if (_languageTag == US_English)
+        if (_languageTag == USEnglish)
         {
-            string englishDictionary = Path.Combine(
-                Path.GetFullPath(DataDirectory),
-                US_English_Dictionary);
-
-            if (File.Exists(englishDictionary))
-            {
-                _userDictionaryPath = Path.Combine(
+            string userDictionaryPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                    "Microsoft",
-                    "Spelling",
-                    _languageTag,
-                    Path.GetFileName(englishDictionary));
-                File.Copy(englishDictionary, _userDictionaryPath, true);
+                nameof(Microsoft),
+                Spelling,
+                USEnglish,
+                USEnglishDictionary);
 
-                if (File.Exists(_userDictionaryPath))
-                {
-                    RegisterUserDictionary(_userDictionaryPath, _languageTag);
-                }
+            WriteResourceToFile(USEnglishResource, userDictionaryPath);
+
+            if (File.Exists(userDictionaryPath))
+            {
+                RegisterUserDictionary(userDictionaryPath, _languageTag);
             }
         }
     }
@@ -164,7 +157,11 @@ public partial class SpellChecker : IDisposable
     ///  The word will no longer be considered misspelled, and will also be considered as a candidate for suggestions.
     /// </para>
     /// </remarks>
-    public void Add(string word) => _spellChecker.Add(word);
+    public void Add(string word)
+    {
+        _spellChecker.Add(word);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Causes the occurrences of one word to be replaced by another.
@@ -175,7 +172,11 @@ public partial class SpellChecker : IDisposable
     /// <param name="to">
     ///  The correctly spelled word that should replace <paramref name="from"/>.
     /// </param>
-    public void AutoCorrect(string from, string to) => _spellChecker.AutoCorrect(from, to);
+    public void AutoCorrect(string from, string to)
+    {
+        _spellChecker.AutoCorrect(from, to);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Checks the spelling of the supplied text and returns a collection of spelling errors.
@@ -244,7 +245,11 @@ public partial class SpellChecker : IDisposable
     ///  The word will no longer be considered misspelled, but it will not be considered as a candidate for suggestions.
     /// </para>
     /// </remarks>
-    public void Ignore(string word) => _spellChecker.Ignore(word);
+    public void Ignore(string word)
+    {
+        _spellChecker.Ignore(word);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Determines whether the specified language is supported by a registered spell checker.
@@ -281,13 +286,20 @@ public partial class SpellChecker : IDisposable
     /// </para>
     /// </remarks>
     public void RegisterUserDictionary(string dictionaryPath, string languageTag)
-        => _registrar.RegisterUserDictionary(dictionaryPath, languageTag);
+    {
+        _registrar.RegisterUserDictionary(dictionaryPath, languageTag);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Removes a word that was previously added by <see cref="Add(string)"/>, or set by <see cref="Ignore(string)"/> to be
     ///  ignored.
     /// </summary>
-    public void Remove(string word) => _spellChecker.Remove(word);
+    public void Remove(string word)
+    {
+        _spellChecker.Remove(word);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Retrieves spelling suggestions for the supplied text.
@@ -345,7 +357,10 @@ public partial class SpellChecker : IDisposable
     /// </para>
     /// </remarks>
     public void UnregisterUserDictionary(string dictionaryPath, string languageTag)
-        => _registrar.UnregisterUserDictionary(dictionaryPath, languageTag);
+    {
+        _registrar.UnregisterUserDictionary(dictionaryPath, languageTag);
+        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+    }
 
     /// <summary>
     ///  Retrieves the next spelling error in the enumeration sequence.
@@ -384,5 +399,12 @@ public partial class SpellChecker : IDisposable
         }
 
         return !string.IsNullOrWhiteSpace(nextString);
+    }
+
+    private void WriteResourceToFile(string resourceName, string fileName)
+    {
+        using Stream resourceStream = GetType().Assembly.GetManifestResourceStream(resourceName);
+        using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
+        resourceStream.CopyTo(fileStream);
     }
 }

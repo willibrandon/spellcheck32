@@ -1,6 +1,6 @@
 # spellcheck32
 
-Usage:
+Sample usage:
 
 ```csharp
 using SpellChecker spellChecker = new("en-US");

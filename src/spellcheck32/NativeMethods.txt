@@ -1,11 +1,7 @@
-﻿CLSCTX
-CoCreateInstance
-CoTaskMemFree
+﻿CoTaskMemFree
 ISpellChecker2
 ISpellCheckerChangedEventHandler
 ISpellCheckerFactory
 IUserDictionariesRegistrar
 RtlGetVersion
-S_FALSE
-S_OK
 SpellCheckerFactory

@@ -2,18 +2,16 @@
 
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
-		<TargetFramework>netstandard2.0</TargetFramework>
 		<Nullable>enable</Nullable>
+		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Dictionary\en_US.dic" />
+	  <None Remove="Dictionary\en_US.zip" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Dictionary\en_US.dic">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </EmbeddedResource>
+	  <EmbeddedResource Include="Dictionary\en_US.zip" />
 	</ItemGroup>
 
 	<ItemGroup>

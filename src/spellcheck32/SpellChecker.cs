@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Win32;
@@ -15,8 +16,8 @@ namespace spellcheck32;
 /// </summary>
 /// <remarks>
 /// <para>
-///  Represents a spell checker for a particular language, with the added ability to remove words from the added words
-///  dictionary, or from the ignore list.
+///  Represents a spell checker for a particular language, with the ability to add or remove words to and from the Added,
+///  Excluded, AutoCorrect, and Ignore lists.
 /// </para>
 /// <para>
 ///  The <see cref="SpellChecker"/> can also be used to check text, get suggestions, and maintain settings and user dictionaries.
@@ -38,7 +39,8 @@ public partial class SpellChecker : IDisposable
     private const string Spelling = "Spelling";
     private const string USEnglish = "en-US";
     private const string USEnglishDictionary = "en_US.dic";
-    private const string USEnglishResource = $"{SpellCheck32}.{Dictionary}.{USEnglishDictionary}";
+    private const string USEnglishDictionaryZip = "en_US.zip";
+    private const string USEnglishResource = $"{SpellCheck32}.{Dictionary}.{USEnglishDictionaryZip}";
 
     private bool _disposedValue;
     private readonly uint _eventCookie;
@@ -97,14 +99,24 @@ public partial class SpellChecker : IDisposable
 
         if (_languageTag == USEnglish)
         {
-            string userDictionaryPath = Path.Combine(
+            string userDictionaryZip = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 nameof(Microsoft),
                 Spelling,
                 USEnglish,
-                USEnglishDictionary);
+                USEnglishDictionaryZip);
+            WriteResourceToFile(USEnglishResource, userDictionaryZip);
+            string userDictionaryPath = Path.Combine(Path.GetDirectoryName(userDictionaryZip), USEnglishDictionary);
+            using (ZipArchive zipArchive = ZipFile.OpenRead(userDictionaryZip))
+            {
+                ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
+                zipArchiveEntry.ExtractToFile(userDictionaryPath, true);
+            }
 
-            WriteResourceToFile(USEnglishResource, userDictionaryPath);
+            if (File.Exists(userDictionaryZip))
+            {
+                File.Delete(userDictionaryZip);
+            }
 
             if (File.Exists(userDictionaryPath))
             {
@@ -123,12 +135,18 @@ public partial class SpellChecker : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (_disposedValue)
+        {
+            return;
+        }
+
+        _disposedValue = true;
+
+        try
         {
             if (_registrar is not null)
             {
                 Marshal.ReleaseComObject(_registrar);
-                _registrar = null!;
             }
 
             if (_spellChecker is not null)
@@ -139,16 +157,18 @@ public partial class SpellChecker : IDisposable
                 }
 
                 Marshal.ReleaseComObject(_spellChecker);
-                _spellChecker = null!;
             }
 
             if (_spellCheckFactory is not null)
             {
                 Marshal.ReleaseComObject(_spellCheckFactory);
-                _spellCheckFactory = null!;
             }
-
-            _disposedValue = true;
+        }
+        finally
+        {
+            _registrar = null!;
+            _spellChecker = null!;
+            _spellCheckFactory = null!;
         }
     }
 

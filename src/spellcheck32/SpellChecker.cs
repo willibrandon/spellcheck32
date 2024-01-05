@@ -99,24 +99,7 @@ public partial class SpellChecker : IDisposable
 
         if (_languageTag == USEnglish)
         {
-            string userDictionaryZip = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                nameof(Microsoft),
-                Spelling,
-                USEnglish,
-                USEnglishDictionaryZip);
-            WriteResourceToFile(USEnglishResource, userDictionaryZip);
-            string userDictionaryPath = Path.Combine(Path.GetDirectoryName(userDictionaryZip), USEnglishDictionary);
-            using (ZipArchive zipArchive = ZipFile.OpenRead(userDictionaryZip))
-            {
-                ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
-                zipArchiveEntry.ExtractToFile(userDictionaryPath, true);
-            }
-
-            if (File.Exists(userDictionaryZip))
-            {
-                File.Delete(userDictionaryZip);
-            }
+            string userDictionaryPath = ExtractUSEnglishDictionary();
 
             if (File.Exists(userDictionaryPath))
             {
@@ -422,6 +405,30 @@ public partial class SpellChecker : IDisposable
         }
 
         return !string.IsNullOrWhiteSpace(nextString);
+    }
+
+    private string ExtractUSEnglishDictionary()
+    {
+        string userDictionaryZip = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                nameof(Microsoft),
+                Spelling,
+                USEnglish,
+                USEnglishDictionaryZip);
+        WriteResourceToFile(USEnglishResource, userDictionaryZip);
+        string userDictionaryPath = Path.Combine(Path.GetDirectoryName(userDictionaryZip), USEnglishDictionary);
+        using (ZipArchive zipArchive = ZipFile.OpenRead(userDictionaryZip))
+        {
+            ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
+            zipArchiveEntry.ExtractToFile(userDictionaryPath, true);
+        }
+
+        if (File.Exists(userDictionaryZip))
+        {
+            File.Delete(userDictionaryZip);
+        }
+
+        return userDictionaryPath;
     }
 
     private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);

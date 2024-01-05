@@ -408,7 +408,8 @@ public partial class SpellChecker : IDisposable
 
     private void WriteResourceToFile(string resourceName, string fileName)
     {
-        using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"The resource '{resourceName}' was not found.");
         using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
         resourceStream.CopyTo(fileStream);
     }

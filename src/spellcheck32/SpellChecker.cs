@@ -24,12 +24,12 @@ namespace spellcheck32;
 /// </para>
 /// <para>
 ///  The user-specific dictionaries for a language, which hold the content for the Added, Excluded, and AutoCorrect word lists,
-///  are located under %AppData%\Microsoft\Spelling\&lt;language tag&gt;. The filenames are default.dic (Added), default.exc (Excluded)
-///  and default.acl (AutoCorrect). The files are UTF-16 LE plaintext that must start with the appropriate Byte Order Mark (BOM).
-///  Each line contains a word (in the Added and Excluded word lists), or an autocorrect pair with the words separated by a
-///  vertical bar ("|") (in the AutoCorrect word list). Other .dic, .exc, and .acl files present in the directory will be
-///  detected by the spell checking service and added to the user word lists. These files are considered to be read-only and are
-///  not modified by the spell checking API.
+///  are located under %AppData%\Microsoft\Spelling\&lt;language tag&gt;. The filenames are default.dic (Added), default.exc
+///  (Excluded) and default.acl (AutoCorrect). The files are UTF-16 LE plaintext that must start with the appropriate Byte
+///  Order Mark (BOM). Each line contains a word (in the Added and Excluded word lists), or an autocorrect pair with the words
+///  separated by a vertical bar ("|") (in the AutoCorrect word list). Other .dic, .exc, and .acl files present in the directory
+///  will be detected by the spell checking service and added to the user word lists. These files are considered to be read-only
+///  and are not modified by the spell checking API.
 /// </para>
 /// </remarks>
 public partial class SpellChecker : IDisposable

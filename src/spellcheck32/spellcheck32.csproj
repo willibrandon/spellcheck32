@@ -6,18 +6,45 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<Authors>willibrandon</Authors>
+		<Copyright>© Brandon Williams. All rights reserved.</Copyright>
+		<Description>A .NET wrapper around the Microsoft Spell Checking API</Description>
+		<IncludeSymbols>True</IncludeSymbols>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageIcon>icon_128x128.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>dotnet;win32;spell;spellcheck;spell-check;spellchecker;spell-checker;spelling;dictionary;suggestions</PackageTags>
+		<PackageProjectUrl>https://github.com/willibrandon/spellcheck32</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/willibrandon/spellcheck32</RepositoryUrl>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Title>A .NET wrapper around the Microsoft Spell Checking API</Title>
+		<Version>1.0.0-alpha</Version>
+	</PropertyGroup>
+
 	<ItemGroup>
-	  <None Remove="Dictionary\en_US.zip" />
+		<None Remove="Dictionary\en_US.zip" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Dictionary\en_US.zip" />
+		<EmbeddedResource Include="Dictionary\en_US.zip" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
-	    <PrivateAssets>all</PrivateAssets>
-	  </PackageReference>
+	  <None Include="..\..\icons\icon_128x128.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.49-beta">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

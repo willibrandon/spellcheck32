@@ -130,9 +130,65 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
 
                 case CorrectiveAction.None:
                 default:
-                    continue;
+                    break;
             }
         }
+    }
+
+    [Fact]
+    public void CheckInParallel()
+    {
+        string text = "Cann I I haev some Linux?";
+        HashSet<string> textToCheck = [];
+
+        for (int i = 0; i < 1000; i++)
+        {
+            textToCheck.Add(text);
+        }
+
+        using SpellChecker spellChecker = new(_languageTag);
+
+        Parallel.ForEach(textToCheck, text =>
+        {
+            foreach (SpellingError error in spellChecker.Check(text))
+            {
+                Assert.True(error.Length > 0);
+                Assert.True(Enum.IsDefined(error.CorrectiveAction));
+
+                string mistake = text.Substring((int)error.StartIndex, (int)error.Length);
+
+                Assert.NotNull(mistake);
+                Assert.NotEmpty(mistake);
+
+                switch (error.CorrectiveAction)
+                {
+                    case CorrectiveAction.Delete:
+                        testOutputHelper.WriteLine(string.Concat("Delete \"", mistake, "\"", Environment.NewLine));
+                        break;
+
+                    case CorrectiveAction.GetSuggestions:
+                        testOutputHelper.WriteLine(string.Concat("Suggest replacing \"", mistake, "\" with:"));
+
+                        foreach (string suggestion in spellChecker.Suggest(mistake))
+                        {
+                            testOutputHelper.WriteLine(string.Concat("\"", suggestion, "\""));
+                        }
+
+                        testOutputHelper.WriteLine(string.Empty);
+                        break;
+
+                    case CorrectiveAction.Replace:
+                        testOutputHelper.WriteLine(
+                            string.Concat("Replace \"", mistake, "\" with \"",
+                                spellChecker.Suggest(mistake).First(), "\"", Environment.NewLine));
+                        break;
+
+                    case CorrectiveAction.None:
+                    default:
+                        continue;
+                }
+            }
+        });
     }
 
     [Fact]
@@ -179,7 +235,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
 
                 case CorrectiveAction.None:
                 default:
-                    continue;
+                    break;
             }
         }
     }

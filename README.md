@@ -3,10 +3,11 @@
 Sample usage:
 
 ```csharp
+string text = "Cann I I haev some Linux?";
+
 using SpellChecker spellChecker = new("en-US");
 spellChecker.AutoCorrect("Linux", "Windows");
 
-string text = "Cann I I haev some Linux?";
 Console.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
 foreach (SpellingError error in spellChecker.Check(text))
@@ -38,7 +39,7 @@ foreach (SpellingError error in spellChecker.Check(text))
 
         case CorrectiveAction.None:
         default:
-            continue;
+            break;
     }
 }
 ```

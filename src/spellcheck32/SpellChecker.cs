@@ -163,7 +163,7 @@ public partial class SpellChecker : IDisposable
     public void Add(string word)
     {
         _spellChecker.Add(word);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -178,7 +178,7 @@ public partial class SpellChecker : IDisposable
     public void AutoCorrect(string from, string to)
     {
         _spellChecker.AutoCorrect(from, to);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -251,7 +251,7 @@ public partial class SpellChecker : IDisposable
     public void Ignore(string word)
     {
         _spellChecker.Ignore(word);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -291,7 +291,7 @@ public partial class SpellChecker : IDisposable
     public void RegisterUserDictionary(string dictionaryPath, string languageTag)
     {
         _registrar.RegisterUserDictionary(dictionaryPath, languageTag);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -301,7 +301,7 @@ public partial class SpellChecker : IDisposable
     public void Remove(string word)
     {
         _spellChecker.Remove(word);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -362,7 +362,7 @@ public partial class SpellChecker : IDisposable
     public void UnregisterUserDictionary(string dictionaryPath, string languageTag)
     {
         _registrar.UnregisterUserDictionary(dictionaryPath, languageTag);
-        SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
+        _handler.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -403,6 +403,8 @@ public partial class SpellChecker : IDisposable
 
         return !string.IsNullOrWhiteSpace(nextString);
     }
+
+    private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
 
     private void WriteResourceToFile(string resourceName, string fileName)
     {

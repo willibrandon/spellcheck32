@@ -49,12 +49,6 @@ public partial class SpellChecker : IDisposable
     private IUserDictionariesRegistrar _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
-    private readonly string _usEnglishDictionaryZip = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        nameof(Microsoft),
-        Spelling,
-        USEnglish,
-        USEnglishDictionaryZip);
     private readonly string _usEnglishDictionaryPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         nameof(Microsoft),
@@ -421,20 +415,29 @@ public partial class SpellChecker : IDisposable
 
     private void ExtractUSEnglishDictionary()
     {
-        WriteResourceToFile(USEnglishResource, _usEnglishDictionaryZip);
+        string usEnglishDictionaryZip = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            nameof(Microsoft),
+            Spelling,
+            USEnglish,
+            USEnglishDictionaryZip);
 
-        if (File.Exists(_usEnglishDictionaryZip))
+        WriteResourceToFile(USEnglishResource, usEnglishDictionaryZip);
+
+        if (File.Exists(usEnglishDictionaryZip))
         {
-            using ZipArchive zipArchive = ZipFile.OpenRead(_usEnglishDictionaryZip);
+            using ZipArchive zipArchive = ZipFile.OpenRead(usEnglishDictionaryZip);
             ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
             zipArchiveEntry.ExtractToFile(_usEnglishDictionaryPath, true);
         }
         
-        if (File.Exists(_usEnglishDictionaryZip))
+        if (File.Exists(usEnglishDictionaryZip))
         {
-            File.Delete(_usEnglishDictionaryZip);
+            File.Delete(usEnglishDictionaryZip);
         }
     }
+
+    private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
 
     private void RegisterUSEnglishDictionary()
     {
@@ -443,8 +446,6 @@ public partial class SpellChecker : IDisposable
             RegisterUserDictionary(_usEnglishDictionaryPath, _languageTag);
         }
     }
-
-    private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
 
     private void WriteResourceToFile(string resourceName, string fileName)
     {

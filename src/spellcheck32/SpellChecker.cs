@@ -49,6 +49,18 @@ public partial class SpellChecker : IDisposable
     private IUserDictionariesRegistrar _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
+    private readonly string _usEnglishDictionaryZip = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        nameof(Microsoft),
+        Spelling,
+        USEnglish,
+        USEnglishDictionaryZip);
+    private readonly string _usEnglishDictionaryPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        nameof(Microsoft),
+        Spelling,
+        USEnglish,
+        USEnglishDictionary);
 
     /// <summary>
     ///  Occurs when there is a change to the state of the spell checker that could cause the text to be treated differently. A
@@ -99,12 +111,12 @@ public partial class SpellChecker : IDisposable
 
         if (_languageTag == USEnglish)
         {
-            string userDictionaryPath = ExtractUSEnglishDictionary();
-
-            if (File.Exists(userDictionaryPath))
+            if (!File.Exists(_usEnglishDictionaryPath))
             {
-                RegisterUserDictionary(userDictionaryPath, _languageTag);
+                ExtractUSEnglishDictionary();
             }
+            
+            RegisterUSEnglishDictionary();
         }
     }
 
@@ -407,28 +419,29 @@ public partial class SpellChecker : IDisposable
         return !string.IsNullOrWhiteSpace(nextString);
     }
 
-    private string ExtractUSEnglishDictionary()
+    private void ExtractUSEnglishDictionary()
     {
-        string userDictionaryZip = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                nameof(Microsoft),
-                Spelling,
-                USEnglish,
-                USEnglishDictionaryZip);
-        WriteResourceToFile(USEnglishResource, userDictionaryZip);
-        string userDictionaryPath = Path.Combine(Path.GetDirectoryName(userDictionaryZip), USEnglishDictionary);
-        using (ZipArchive zipArchive = ZipFile.OpenRead(userDictionaryZip))
+        WriteResourceToFile(USEnglishResource, _usEnglishDictionaryZip);
+
+        if (File.Exists(_usEnglishDictionaryZip))
         {
+            using ZipArchive zipArchive = ZipFile.OpenRead(_usEnglishDictionaryZip);
             ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
-            zipArchiveEntry.ExtractToFile(userDictionaryPath, true);
+            zipArchiveEntry.ExtractToFile(_usEnglishDictionaryPath, true);
         }
-
-        if (File.Exists(userDictionaryZip))
+        
+        if (File.Exists(_usEnglishDictionaryZip))
         {
-            File.Delete(userDictionaryZip);
+            File.Delete(_usEnglishDictionaryZip);
         }
+    }
 
-        return userDictionaryPath;
+    private void RegisterUSEnglishDictionary()
+    {
+        if (File.Exists(_usEnglishDictionaryPath))
+        {
+            RegisterUserDictionary(_usEnglishDictionaryPath, _languageTag);
+        }
     }
 
     private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);

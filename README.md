@@ -1,5 +1,7 @@
 # spellcheck32
 
+A .NET wrapper around the Microsoft Spell Checking API
+
 Sample usage:
 
 ```csharp

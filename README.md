@@ -12,7 +12,7 @@ Console.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
 foreach (SpellingError error in spellChecker.Check(text))
 {
-    string mistake = text.Substring((int)error.StartIndex, (int)error.Length);
+    string mistake = text.Substring(error.StartIndex, error.Length);
 
     switch (spellingError.CorrectiveAction)
     {

@@ -100,7 +100,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.True(error.Length > 0);
             Assert.True(Enum.IsDefined(error.CorrectiveAction));
 
-            string mistake = text.Substring((int)error.StartIndex, (int)error.Length);
+            string mistake = text.Substring(error.StartIndex, error.Length);
 
             Assert.NotNull(mistake);
             Assert.NotEmpty(mistake);
@@ -149,7 +149,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.True(error.Length > 0);
             Assert.True(Enum.IsDefined(error.CorrectiveAction));
 
-            string mistake = text.Substring((int)error.StartIndex, (int)error.Length);
+            string mistake = text.Substring(error.StartIndex, error.Length);
 
             Assert.NotNull(mistake);
             Assert.NotEmpty(mistake);

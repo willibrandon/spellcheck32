@@ -204,9 +204,9 @@ public partial class SpellChecker : IDisposable
                 yield return new SpellingError()
                 {
                     CorrectiveAction = (CorrectiveAction)spellingError.CorrectiveAction,
-                    Length = spellingError.Length,
+                    Length = (int)spellingError.Length,
                     Replacement = spellingError.Replacement.ToString(),
-                    StartIndex = spellingError.StartIndex
+                    StartIndex = (int)spellingError.StartIndex
                 };
             }
         }
@@ -234,9 +234,9 @@ public partial class SpellChecker : IDisposable
                 yield return new SpellingError()
                 {
                     CorrectiveAction = (CorrectiveAction)spellingError.CorrectiveAction,
-                    Length = spellingError.Length,
+                    Length = (int)spellingError.Length,
                     Replacement = spellingError.Replacement.ToString(),
-                    StartIndex = spellingError.StartIndex
+                    StartIndex = (int)spellingError.StartIndex
                 };
             }
         }

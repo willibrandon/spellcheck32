@@ -10,7 +10,7 @@ public class SpellingError
     /// <summary>
     ///  Gets the length of the erroneous text.
     /// </summary>
-    public long Length { get; internal set; }
+    public int Length { get; internal set; }
 
     /// <summary>
     ///  Gets the text to use as replacement text when the corrective action is <see cref="CorrectiveAction.Replace"/>.
@@ -20,5 +20,5 @@ public class SpellingError
     /// <summary>
     ///  Gets the position in the checked text where the error begins.
     /// </summary>
-    public long StartIndex { get; internal set; }
+    public int StartIndex { get; internal set; }
 }

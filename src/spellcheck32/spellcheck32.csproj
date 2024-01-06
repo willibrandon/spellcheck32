@@ -19,7 +19,7 @@
 		<RepositoryUrl>https://github.com/willibrandon/spellcheck32</RepositoryUrl>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<Title>A .NET wrapper around the Microsoft Spell Checking API</Title>
-		<Version>1.0.0-alpha</Version>
+		<Version>1.0.1-alpha</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

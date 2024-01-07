@@ -230,6 +230,12 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
+    public void InvalidLanguageTag_ThrowsNotSupportedException()
+    {
+        Assert.Throws<NotSupportedException>(() => new SpellChecker("english"));
+    }
+
+    [Fact]
     public void IsLanguageSupported()
     {
         using SpellChecker spellChecker = new(_languageTag);

@@ -230,6 +230,83 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
+    public void Edit_Delete()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("arrainged").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("arranged", suggestions);
+    }
+
+    [Fact]
+    public void Edit_Insert()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("speling").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("spelling", suggestions);
+    }
+
+    [Fact]
+    public void Edit_Insert2()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("inconvient").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("inconvenient", suggestions);
+    }
+
+    [Fact]
+    public void Edit_Replace()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("bycycle").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("bicycle", suggestions);
+    }
+
+    [Fact]
+    public void Edit_Replace2()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("korrectud").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("corrected", suggestions);
+    }
+
+    [Fact]
+    public void Edit_Transpose()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("peotry").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("poetry", suggestions);
+    }
+
+    [Fact]
+    public void Edit_TransposeDelete()
+    {
+        using SpellChecker spellChecker = new(_languageTag);
+
+        List<string> suggestions = spellChecker.Suggest("peotryy").ToList();
+
+        Assert.NotEmpty(suggestions);
+        Assert.Contains("poetry", suggestions);
+    }
+
+    [Fact]
     public void IsLanguageSupported()
     {
         using SpellChecker spellChecker = new(_languageTag);

@@ -75,17 +75,17 @@ public class SpellChecker
     /// <summary>
     ///  Gets the identifier of the spell checker.
     /// </summary>
-    public string? Id { get; }
+    public string Id { get; }
 
     /// <summary>
     ///  Gets the BCP47 language tag this instance of the spell checker supports.
     /// </summary>
-    public string? LanguageTag { get; }
+    public string LanguageTag { get; }
 
     /// <summary>
     ///  Gets text, suitable to display to the user, that describes this spell checker.
     /// </summary>
-    public string? LocalizedName => { get; }
+    public string LocalizedName { get; }
 
     /// <summary>
     ///  Creates a new instance of the <see cref="SpellChecker"/> class.

@@ -65,17 +65,17 @@ public partial class SpellChecker : IDisposable
     /// <summary>
     ///  Gets the identifier of the spell checker.
     /// </summary>
-    public string? Id => _spellChecker?.Id.ToString();
+    public string Id => _spellChecker?.Id.ToString() ?? string.Empty;
 
     /// <summary>
     ///  Gets the BCP47 language tag this instance of the spell checker supports.
     /// </summary>
-    public string? LanguageTag => _spellChecker?.LanguageTag.ToString();
+    public string LanguageTag => _spellChecker?.LanguageTag.ToString() ?? string.Empty;
 
     /// <summary>
     ///  Gets text, suitable to display to the user, that describes this spell checker.
     /// </summary>
-    public string? LocalizedName => _spellChecker?.LocalizedName.ToString();
+    public string LocalizedName => _spellChecker?.LocalizedName.ToString() ?? string.Empty;
 
     /// <summary>
     ///  Creates a new instance of the <see cref="SpellChecker"/> class.

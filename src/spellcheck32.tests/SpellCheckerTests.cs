@@ -136,8 +136,19 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
         }
     }
 
+    /// <summary>
+    ///  A simple test to compare the performance of the serial and parallel wavefront edit distance algorithms.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///  <a href="https://en.wikipedia.org/wiki/Edit_distance"/>
+    /// </para>
+    /// <para>
+    ///  <a href="https://en.wikipedia.org/wiki/Wavefront"/>
+    /// </para>
+    /// </remarks>
     [Fact]
-    public void ComputeEditDistance()
+    public void ComputeEditDistance_SerialVersusParallelWavefront()
     {
         Random rand = new();
         Stopwatch sw = new();
@@ -156,7 +167,6 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
         testOutputHelper.WriteLine($"Parallel:\t{result}\t{sw.Elapsed}");
 
         testOutputHelper.WriteLine("-------------------------------------------------------");
-        GC.Collect();
     }
 
     [Fact]
@@ -366,7 +376,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void Register_Unregister_UserDictionary_SpellCheckerChanged()
+    public void RegisterUnregister_UserDictionary_SpellCheckerChanged()
     {
         string userDictionary = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

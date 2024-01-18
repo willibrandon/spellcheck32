@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Windows.Win32.Globalization;
 using Xunit.Abstractions;
@@ -133,6 +134,29 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
                     break;
             }
         }
+    }
+
+    [Fact]
+    public void ComputeEditDistance()
+    {
+        Random rand = new();
+        Stopwatch sw = new();
+
+        string s1 = CommonTestHelper.GenerateRandomString(rand);
+        string s2 = CommonTestHelper.GenerateRandomString(rand);
+
+        sw.Restart();
+        int result = CommonTestHelper.SerialEditDistance(s1, s2);
+        sw.Stop();
+        testOutputHelper.WriteLine($"Serial  :\t{result}\t{sw.Elapsed}");
+
+        sw.Restart();
+        result = CommonTestHelper.ParallelEditDistance(s1, s2);
+        sw.Stop();
+        testOutputHelper.WriteLine($"Parallel:\t{result}\t{sw.Elapsed}");
+
+        testOutputHelper.WriteLine("-------------------------------------------------------");
+        GC.Collect();
     }
 
     [Fact]

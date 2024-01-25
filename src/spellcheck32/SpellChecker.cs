@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Foundation;
@@ -34,14 +31,9 @@ namespace spellcheck32;
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
-    private const string Dictionary = "Dictionary";
-    private const string SpellCheck32 = "spellcheck32";
-    private const string Spelling = "Spelling";
     private const string USEnglish = "en-US";
-    private const string USEnglishDictionary = "en_US.dic";
-    private const string USEnglishDictionaryZip = "en_US.zip";
-    private const string USEnglishResource = $"{SpellCheck32}.{Dictionary}.{USEnglishDictionaryZip}";
 
+    private readonly DictionaryHelper _dictionaryHelper;
     private bool _disposedValue;
     private readonly uint _eventCookie;
     private readonly ISpellCheckerChangedEventHandler _handler;
@@ -49,13 +41,7 @@ public partial class SpellChecker : IDisposable
     private IUserDictionariesRegistrar _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
-    private readonly string _usEnglishDictionaryPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        nameof(Microsoft),
-        Spelling,
-        USEnglish,
-        USEnglishDictionary);
-
+    
     /// <summary>
     ///  Occurs when there is a change to the state of the spell checker that could cause the text to be treated differently. A
     ///  client should recheck the text when this event is received.
@@ -102,15 +88,11 @@ public partial class SpellChecker : IDisposable
         _handler = new SpellCheckEvents(this);
         _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
         _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
+        _dictionaryHelper = new DictionaryHelper(this);
 
         if (_languageTag == USEnglish)
         {
-            if (!File.Exists(_usEnglishDictionaryPath))
-            {
-                ExtractUSEnglishDictionary();
-            }
-            
-            RegisterUSEnglishDictionary();
+            _dictionaryHelper.InstallUSEnglishDictionary();
         }
     }
 
@@ -413,45 +395,5 @@ public partial class SpellChecker : IDisposable
         return !string.IsNullOrWhiteSpace(nextString);
     }
 
-    private void ExtractUSEnglishDictionary()
-    {
-        string usEnglishDictionaryZip = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            nameof(Microsoft),
-            Spelling,
-            USEnglish,
-            USEnglishDictionaryZip);
-
-        WriteResourceToFile(USEnglishResource, usEnglishDictionaryZip);
-
-        if (File.Exists(usEnglishDictionaryZip))
-        {
-            using ZipArchive zipArchive = ZipFile.OpenRead(usEnglishDictionaryZip);
-            ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
-            zipArchiveEntry.ExtractToFile(_usEnglishDictionaryPath, true);
-        }
-        
-        if (File.Exists(usEnglishDictionaryZip))
-        {
-            File.Delete(usEnglishDictionaryZip);
-        }
-    }
-
     private void OnSpellCheckerChanged() => SpellCheckerChanged?.Invoke(_spellChecker, EventArgs.Empty);
-
-    private void RegisterUSEnglishDictionary()
-    {
-        if (File.Exists(_usEnglishDictionaryPath))
-        {
-            RegisterUserDictionary(_usEnglishDictionaryPath, _languageTag);
-        }
-    }
-
-    private void WriteResourceToFile(string resourceName, string fileName)
-    {
-        using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
-            ?? throw new InvalidOperationException($"The resource '{resourceName}' was not found.");
-        using FileStream fileStream = new(fileName, FileMode.Create, FileAccess.Write);
-        resourceStream.CopyTo(fileStream);
-    }
 }

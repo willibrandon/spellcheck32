@@ -106,7 +106,7 @@ internal class DictionaryHelper(SpellChecker spellChecker)
                 throw new InvalidOperationException($"Failed to extract '{filePath}'.");
             }
 
-            if (ValidateDictionary(_usEnglishDictionaryPath))
+            if (ValidateDictionary(filePath))
             {
                 RegisterUSEnglishDictionary();
             }

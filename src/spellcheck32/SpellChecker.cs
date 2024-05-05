@@ -89,11 +89,6 @@ public partial class SpellChecker : IDisposable
         _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
         _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
         _dictionaryHelper = new DictionaryHelper(this);
-
-        if (_languageTag == USEnglish)
-        {
-            _dictionaryHelper.InstallUSEnglishDictionary();
-        }
     }
 
     ~SpellChecker() => Dispose(false);

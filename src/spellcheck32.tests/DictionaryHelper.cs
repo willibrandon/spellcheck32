@@ -1,20 +1,18 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 
-namespace spellcheck32;
+namespace spellcheck32.tests;
 
-internal class DictionaryHelper(SpellChecker spellChecker)
+public class DictionaryHelper(SpellChecker spellChecker)
 {
     private const string Dictionary = "Dictionary";
-    private const string SpellCheck32 = "spellcheck32";
+    private const string SpellCheck32Tests = "spellcheck32.tests";
     private const string Spelling = "Spelling";
     private const string USEnglish = "en-US";
     private const string USEnglishDictionary = "en_US.dic";
     private const string USEnglishDictionaryZip = "en_US.zip";
-    private const string USEnglishResource = $"{SpellCheck32}.{Dictionary}.{USEnglishDictionaryZip}";
+    private const string USEnglishResource = $"{SpellCheck32Tests}.{Dictionary}.{USEnglishDictionaryZip}";
 
     private readonly string _usEnglishDictionaryPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -41,7 +39,7 @@ internal class DictionaryHelper(SpellChecker spellChecker)
             // Write the Byte Order Mark (BOM).
             streamWriter.Write(Encoding.Unicode.GetPreamble());
 
-            string line = string.Empty;
+            string? line = string.Empty;
             while ((line = streamReader.ReadLine()) is not null)
             {
                 streamWriter.WriteLine(line);
@@ -68,8 +66,8 @@ internal class DictionaryHelper(SpellChecker spellChecker)
         if (File.Exists(usEnglishDictionaryZip))
         {
             using ZipArchive zipArchive = ZipFile.OpenRead(usEnglishDictionaryZip);
-            ZipArchiveEntry zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
-            zipArchiveEntry.ExtractToFile(_usEnglishDictionaryPath, true);
+            ZipArchiveEntry? zipArchiveEntry = zipArchive.GetEntry(USEnglishDictionary);
+            zipArchiveEntry?.ExtractToFile(_usEnglishDictionaryPath, true);
         }
 
         if (File.Exists(usEnglishDictionaryZip))
@@ -106,7 +104,7 @@ internal class DictionaryHelper(SpellChecker spellChecker)
                 throw new InvalidOperationException($"Failed to extract '{filePath}'.");
             }
 
-            if (ValidateDictionary(_usEnglishDictionaryPath))
+            if (ValidateDictionary(filePath))
             {
                 RegisterUSEnglishDictionary();
             }

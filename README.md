@@ -16,7 +16,7 @@ foreach (SpellingError error in spellChecker.Check(text))
 {
     string mistake = text.Substring(error.StartIndex, error.Length);
 
-    switch (spellingError.CorrectiveAction)
+    switch (error.CorrectiveAction)
     {
         case CorrectiveAction.Delete:
             Console.WriteLine(string.Concat("Delete \"", mistake, "\"", Environment.NewLine));

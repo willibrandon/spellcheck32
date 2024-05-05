@@ -33,7 +33,6 @@ public partial class SpellChecker : IDisposable
 {
     private const string USEnglish = "en-US";
 
-    private readonly DictionaryHelper _dictionaryHelper;
     private bool _disposedValue;
     private readonly uint _eventCookie;
     private readonly ISpellCheckerChangedEventHandler _handler;
@@ -88,7 +87,6 @@ public partial class SpellChecker : IDisposable
         _handler = new SpellCheckEvents(this);
         _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
         _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
-        _dictionaryHelper = new DictionaryHelper(this);
     }
 
     ~SpellChecker() => Dispose(false);

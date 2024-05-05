@@ -23,14 +23,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Dictionary\en_US.zip" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Dictionary\en_US.zip" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Include="..\..\icons\icon_128x128.png">
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>

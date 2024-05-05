@@ -5,17 +5,15 @@ using Xunit.Abstractions;
 
 namespace spellcheck32.tests;
 
-public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
+public class SpellCheckerTests(ITestOutputHelper testOutputHelper) : TestsBase
 {
     private readonly string _languageTag = CultureInfo.CurrentCulture.IetfLanguageTag;
 
     [Fact]
     public void AddWord()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        spellChecker.Add("readible");
-        List<SpellingError> spellingErrors = spellChecker.Check("readible").ToList();
+        SpellChecker.Add("readible");
+        List<SpellingError> spellingErrors = SpellChecker.Check("readible").ToList();
 
         Assert.True(spellingErrors.Count == 0);
     }
@@ -24,8 +22,8 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     public void AddWord_SpellCheckerChanged()
     {
         int changedCount = 0;
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.SpellCheckerChanged += (sender, args) =>
+
+        SpellChecker.SpellCheckerChanged += (sender, args) =>
         {
             changedCount++;
             ISpellChecker? checker = sender as ISpellChecker;
@@ -41,7 +39,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.Equal("Microsoft Windows Spellchecker", checker.LocalizedName.ToString());
         };
 
-        spellChecker.Add("cowabunga");
+        SpellChecker.Add("cowabunga");
 
         Assert.Equal(1, changedCount);
     }
@@ -49,10 +47,8 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void AutoCorrectWord()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        spellChecker.AutoCorrect("Linux", "Windows");
-        List<SpellingError> spellingErrors = spellChecker.Check("Linux").ToList();
+        SpellChecker.AutoCorrect("Linux", "Windows");
+        List<SpellingError> spellingErrors = SpellChecker.Check("Linux").ToList();
 
         Assert.Single(spellingErrors);
         Assert.Equal(CorrectiveAction.Replace, spellingErrors[0].CorrectiveAction);
@@ -65,8 +61,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     public void AutoCorrectWord_SpellCheckerChanged()
     {
         int changedCount = 0;
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.SpellCheckerChanged += (sender, args) =>
+        SpellChecker.SpellCheckerChanged += (sender, args) =>
         {
             changedCount++;
             ISpellChecker? checker = sender as ISpellChecker;
@@ -82,7 +77,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.Equal("Microsoft Windows Spellchecker", checker.LocalizedName.ToString());
         };
 
-        spellChecker.AutoCorrect(from: "Linux", to: "Windows");
+        SpellChecker.AutoCorrect(from: "Linux", to: "Windows");
 
         Assert.Equal(1, changedCount);
     }
@@ -90,13 +85,12 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Check()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.AutoCorrect("Linux", "Windows");
+        SpellChecker.AutoCorrect("Linux", "Windows");
 
         string text = "Cann I I haev some Linux?";
         testOutputHelper.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
-        foreach (SpellingError error in spellChecker.Check(text))
+        foreach (SpellingError error in SpellChecker.Check(text))
         {
             Assert.True(error.Length > 0);
             Assert.True(Enum.IsDefined(error.CorrectiveAction));
@@ -115,7 +109,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
                 case CorrectiveAction.GetSuggestions:
                     testOutputHelper.WriteLine(string.Concat("Suggest replacing \"", mistake, "\" with:"));
 
-                    foreach (string suggestion in spellChecker.Suggest(mistake))
+                    foreach (string suggestion in SpellChecker.Suggest(mistake))
                     {
                         testOutputHelper.WriteLine(string.Concat("\"", suggestion, "\""));
                     }
@@ -126,7 +120,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
                 case CorrectiveAction.Replace:
                     testOutputHelper.WriteLine(
                         string.Concat("Replace \"", mistake, "\" with \"",
-                            spellChecker.Suggest(mistake).First(), "\"", Environment.NewLine));
+                            SpellChecker.Suggest(mistake).First(), "\"", Environment.NewLine));
                     break;
 
                 case CorrectiveAction.None:
@@ -172,13 +166,12 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void ComprehensiveCheck()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.AutoCorrect("Linux", "Windows");
+        SpellChecker.AutoCorrect("Linux", "Windows");
 
         string text = "Cann I I haev some Linux?";
         testOutputHelper.WriteLine(string.Concat("Check \"", text, "\"", Environment.NewLine));
 
-        foreach (SpellingError error in spellChecker.ComprehensiveCheck(text))
+        foreach (SpellingError error in SpellChecker.ComprehensiveCheck(text))
         {
             Assert.True(error.Length > 0);
             Assert.True(Enum.IsDefined(error.CorrectiveAction));
@@ -197,7 +190,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
                 case CorrectiveAction.GetSuggestions:
                     testOutputHelper.WriteLine(string.Concat("Suggest replacing \"", mistake, "\" with:"));
 
-                    foreach (string suggestion in spellChecker.Suggest(mistake))
+                    foreach (string suggestion in SpellChecker.Suggest(mistake))
                     {
                         testOutputHelper.WriteLine(string.Concat("\"", suggestion, "\""));
                     }
@@ -208,7 +201,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
                 case CorrectiveAction.Replace:
                     testOutputHelper.WriteLine(
                         string.Concat("Replace \"", mistake, "\" with \"",
-                            spellChecker.Suggest(mistake).First(), "\"", Environment.NewLine));
+                            SpellChecker.Suggest(mistake).First(), "\"", Environment.NewLine));
                     break;
 
                 case CorrectiveAction.None:
@@ -221,9 +214,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Delete()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("arrainged").ToList();
+        List<string> suggestions = SpellChecker.Suggest("arrainged").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("arranged", suggestions);
@@ -232,9 +223,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Insert()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("speling").ToList();
+        List<string> suggestions = SpellChecker.Suggest("speling").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("spelling", suggestions);
@@ -243,9 +232,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Insert2()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("inconvient").ToList();
+        List<string> suggestions = SpellChecker.Suggest("inconvient").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("inconvenient", suggestions);
@@ -254,9 +241,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Replace()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("bycycle").ToList();
+        List<string> suggestions = SpellChecker.Suggest("bycycle").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("bicycle", suggestions);
@@ -265,9 +250,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Replace2()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("korrectud").ToList();
+        List<string> suggestions = SpellChecker.Suggest("korrectud").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("corrected", suggestions);
@@ -276,9 +259,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_Transpose()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("peotry").ToList();
+        List<string> suggestions = SpellChecker.Suggest("peotry").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("poetry", suggestions);
@@ -287,9 +268,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Edit_TransposeDelete()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("peotryy").ToList();
+        List<string> suggestions = SpellChecker.Suggest("peotryy").ToList();
 
         Assert.NotEmpty(suggestions);
         Assert.Contains("poetry", suggestions);
@@ -298,18 +277,14 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void Id()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        Assert.Equal("MsSpell", spellChecker.Id);
+        Assert.Equal("MsSpell", SpellChecker.Id);
     }
 
     [Fact]
     public void IgnoreWord()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        spellChecker.Ignore("secratary");
-        List<SpellingError> spellingErrors = spellChecker.Check("secratary").ToList();
+        SpellChecker.Ignore("secratary");
+        List<SpellingError> spellingErrors = SpellChecker.Check("secratary").ToList();
 
         Assert.True(spellingErrors.Count == 0);
     }
@@ -318,8 +293,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     public void IgnoreWord_SpellCheckerChanged()
     {
         int changedCount = 0;
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.SpellCheckerChanged += (sender, args) =>
+        SpellChecker.SpellCheckerChanged += (sender, args) =>
         {
             changedCount++;
             ISpellChecker? checker = sender as ISpellChecker;
@@ -335,7 +309,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.Equal("Microsoft Windows Spellchecker", checker.LocalizedName.ToString());
         };
 
-        spellChecker.Ignore("cowabunga");
+        SpellChecker.Ignore("cowabunga");
 
         Assert.Equal(1, changedCount);
     }
@@ -349,30 +323,24 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void IsLanguageSupported()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        foreach (string language in spellChecker.SupportedLanguages())
+        foreach (string language in SpellChecker.SupportedLanguages())
         {
             testOutputHelper.WriteLine(language);
 
-            Assert.True(spellChecker.IsLanguageSupported(language));
+            Assert.True(SpellChecker.IsLanguageSupported(language));
         }
     }
 
     [Fact]
     public void LanguageTag()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        Assert.Equal(_languageTag, spellChecker.LanguageTag);
+        Assert.Equal(_languageTag, SpellChecker.LanguageTag);
     }
 
     [Fact]
     public void LocalizedName()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        Assert.Equal("Microsoft Windows Spellchecker", spellChecker.LocalizedName);
+        Assert.Equal("Microsoft Windows Spellchecker", SpellChecker.LocalizedName);
     }
 
     [Fact]
@@ -388,8 +356,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
         Assert.True(File.Exists(userDictionary));
 
         int changedCount = 0;
-        using SpellChecker spellChecker = new(_languageTag);
-        spellChecker.SpellCheckerChanged += (sender, args) =>
+        SpellChecker.SpellCheckerChanged += (sender, args) =>
         {
             changedCount++;
             ISpellChecker? checker = sender as ISpellChecker;
@@ -405,8 +372,8 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
             Assert.Equal("Microsoft Windows Spellchecker", checker.LocalizedName.ToString());
         };
 
-        spellChecker.RegisterUserDictionary(userDictionary, _languageTag);
-        spellChecker.UnregisterUserDictionary(userDictionary, _languageTag);
+        SpellChecker.RegisterUserDictionary(userDictionary, _languageTag);
+        SpellChecker.UnregisterUserDictionary(userDictionary, _languageTag);
         File.Delete(userDictionary);
 
         Assert.Equal(2, changedCount);
@@ -415,15 +382,13 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void RemoveWord()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        spellChecker.Ignore("repitition");
-        List<SpellingError> spellingErrors = spellChecker.Check("repitition").ToList();
+        SpellChecker.Ignore("repitition");
+        List<SpellingError> spellingErrors = SpellChecker.Check("repitition").ToList();
 
         Assert.True(spellingErrors.Count == 0);
 
-        spellChecker.Remove("repitition");
-        spellingErrors = spellChecker.Check("repitition").ToList();
+        SpellChecker.Remove("repitition");
+        spellingErrors = SpellChecker.Check("repitition").ToList();
 
         Assert.Single(spellingErrors);
     }
@@ -431,9 +396,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void SuggestWords()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        List<string> suggestions = spellChecker.Suggest("publically").ToList();
+        List<string> suggestions = SpellChecker.Suggest("publically").ToList();
 
         Assert.True(suggestions.Count > 0);
         Assert.Contains("publicly", suggestions);
@@ -442,9 +405,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public void SupportedLanguages()
     {
-        using SpellChecker spellChecker = new(_languageTag);
-
-        foreach (string language in spellChecker.SupportedLanguages())
+        foreach (string language in SpellChecker.SupportedLanguages())
         {
             Assert.NotNull(language);
             Assert.NotEmpty(language);

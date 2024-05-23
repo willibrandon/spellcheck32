@@ -31,13 +31,11 @@ namespace spellcheck32;
 /// </remarks>
 public partial class SpellChecker : IDisposable
 {
-    private const string USEnglish = "en-US";
-
     private bool _disposedValue;
     private readonly uint _eventCookie;
-    private readonly ISpellCheckerChangedEventHandler _handler;
+    private readonly ISpellCheckerChangedEventHandler? _handler;
     private readonly string _languageTag;
-    private IUserDictionariesRegistrar _registrar;
+    private IUserDictionariesRegistrar? _registrar;
     private ISpellChecker2 _spellChecker;
     private ISpellCheckerFactory _spellCheckFactory;
     
@@ -70,23 +68,47 @@ public partial class SpellChecker : IDisposable
     /// </param>
     public SpellChecker(string languageTag)
     {
-        if (!OsVersion.IsWindows8OrGreater())
+        try
         {
-            throw new PlatformNotSupportedException("The Microsoft Spell Checking API is only supported on Windows 8 and later.");
+            if (!OsVersion.IsWindows8OrGreater())
+            {
+                throw new PlatformNotSupportedException("The Microsoft Spell Checking API is only supported on Windows 8 and later.");
+            }
+
+            _spellCheckFactory = (ISpellCheckerFactory)new SpellCheckerFactory();
+
+            if (!_spellCheckFactory.IsSupported(languageTag))
+            {
+                throw new NotSupportedException($"The language tag '{_languageTag}' is not supported.");
+            }
+
+            _languageTag = languageTag;
+            _spellChecker = (ISpellChecker2)_spellCheckFactory.CreateSpellChecker(_languageTag);
         }
-
-        _spellCheckFactory = (ISpellCheckerFactory)new SpellCheckerFactory();
-
-        if (!_spellCheckFactory.IsSupported(languageTag))
+        catch
         {
-            throw new NotSupportedException($"The language tag '{_languageTag}' is not supported.");
+            throw;
         }
-
-        _languageTag = languageTag;
-        _spellChecker = (ISpellChecker2)_spellCheckFactory.CreateSpellChecker(_languageTag);
-        _handler = new SpellCheckEvents(this);
-        _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
-        _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
+        
+        try
+        {
+            _handler = new SpellCheckEvents(this);
+            _eventCookie = _spellChecker.add_SpellCheckerChanged(_handler);
+        }
+        catch
+        {
+            _handler = null;
+            _eventCookie = 0;
+        }
+        
+        try
+        {
+            _registrar = (IUserDictionariesRegistrar)new SpellCheckerFactory();
+        }
+        catch
+        {
+            _registrar = null;
+        }
     }
 
     ~SpellChecker() => Dispose(false);
@@ -130,7 +152,7 @@ public partial class SpellChecker : IDisposable
         }
         finally
         {
-            _registrar = null!;
+            _registrar = null;
             _spellChecker = null!;
             _spellCheckFactory = null!;
         }
@@ -147,7 +169,7 @@ public partial class SpellChecker : IDisposable
     public void Add(string word)
     {
         _spellChecker.Add(word);
-        _handler.Invoke(_spellChecker);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -162,7 +184,7 @@ public partial class SpellChecker : IDisposable
     public void AutoCorrect(string from, string to)
     {
         _spellChecker.AutoCorrect(from, to);
-        _handler.Invoke(_spellChecker);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -235,7 +257,7 @@ public partial class SpellChecker : IDisposable
     public void Ignore(string word)
     {
         _spellChecker.Ignore(word);
-        _handler.Invoke(_spellChecker);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -274,8 +296,8 @@ public partial class SpellChecker : IDisposable
     /// </remarks>
     public void RegisterUserDictionary(string dictionaryPath, string languageTag)
     {
-        _registrar.RegisterUserDictionary(dictionaryPath, languageTag);
-        _handler.Invoke(_spellChecker);
+        _registrar?.RegisterUserDictionary(dictionaryPath, languageTag);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -285,7 +307,7 @@ public partial class SpellChecker : IDisposable
     public void Remove(string word)
     {
         _spellChecker.Remove(word);
-        _handler.Invoke(_spellChecker);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>
@@ -345,8 +367,8 @@ public partial class SpellChecker : IDisposable
     /// </remarks>
     public void UnregisterUserDictionary(string dictionaryPath, string languageTag)
     {
-        _registrar.UnregisterUserDictionary(dictionaryPath, languageTag);
-        _handler.Invoke(_spellChecker);
+        _registrar?.UnregisterUserDictionary(dictionaryPath, languageTag);
+        _handler?.Invoke(_spellChecker);
     }
 
     /// <summary>

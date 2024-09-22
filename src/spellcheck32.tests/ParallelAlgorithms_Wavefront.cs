@@ -1,9 +1,4 @@
-﻿//
-// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE.md file in the project root for full license information.
-//
-
-namespace System.Threading.Algorithms;
+﻿namespace spellcheck32.tests;
 
 public static partial class ParallelAlgorithms
 {

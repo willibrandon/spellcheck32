@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Threading.Algorithms;
 
 namespace spellcheck32.tests;
 

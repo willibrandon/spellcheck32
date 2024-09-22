@@ -25,7 +25,7 @@ public class DictionaryHelper(SpellChecker spellChecker)
     ///  Converts the specified file to UTF-16 LE plaintext with the required Byte Order Mark (BOM).
     /// </summary>
     /// <param name="filePath">The path of the file to convert.</param>
-    public void ConvertToUtf16WithBOM(string filePath)
+    public static void ConvertToUtf16WithBOM(string filePath)
     {
         const string tempExt = ".tmp";
 
@@ -135,7 +135,7 @@ public class DictionaryHelper(SpellChecker spellChecker)
     /// <returns>
     ///  <see langword="true"/> if the specified dictionary is valid, otherwise <see langword="false"/>.
     /// </returns>
-    public bool ValidateDictionary(string dictionaryPath)
+    public static bool ValidateDictionary(string dictionaryPath)
     {
         byte[] bom = new byte[4];
         using (FileStream fileStream = new(dictionaryPath, FileMode.Open, FileAccess.Read, FileShare.Read))
@@ -151,7 +151,7 @@ public class DictionaryHelper(SpellChecker spellChecker)
     /// </summary>
     /// <param name="resourceName">The name of the resource.</param>
     /// <param name="filePath">The file path to write the resource to.</param>
-    public void WriteResourceToFile(string resourceName, string filePath)
+    public static void WriteResourceToFile(string resourceName, string filePath)
     {
         using Stream resourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)
             ?? throw new InvalidOperationException($"The resource '{resourceName}' was not found.");

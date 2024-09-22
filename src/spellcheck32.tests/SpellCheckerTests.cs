@@ -15,7 +15,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper) : TestsBase
         SpellChecker.Add("readible");
         List<SpellingError> spellingErrors = SpellChecker.Check("readible").ToList();
 
-        Assert.True(spellingErrors.Count == 0);
+        Assert.Empty(spellingErrors);
     }
 
     [Fact]
@@ -286,7 +286,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper) : TestsBase
         SpellChecker.Ignore("secratary");
         List<SpellingError> spellingErrors = SpellChecker.Check("secratary").ToList();
 
-        Assert.True(spellingErrors.Count == 0);
+        Assert.Empty(spellingErrors);
     }
 
     [Fact]
@@ -385,7 +385,7 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper) : TestsBase
         SpellChecker.Ignore("repitition");
         List<SpellingError> spellingErrors = SpellChecker.Check("repitition").ToList();
 
-        Assert.True(spellingErrors.Count == 0);
+        Assert.Empty(spellingErrors);
 
         SpellChecker.Remove("repitition");
         spellingErrors = SpellChecker.Check("repitition").ToList();

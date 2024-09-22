@@ -3,7 +3,7 @@ updates:
 - package-ecosystem: nuget
   directories:
     - "/src/spellcheck32"
-    - "/src/spellcheck3.tests"
+    - "/src/spellcheck32.tests"
   schedule:
     interval: daily
   open-pull-requests-limit: 10

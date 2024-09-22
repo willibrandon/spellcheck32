@@ -315,9 +315,9 @@ public class SpellCheckerTests(ITestOutputHelper testOutputHelper) : TestsBase
     }
 
     [Fact]
-    public void InvalidLanguageTag_ThrowsNotSupportedException()
+    public void InvalidLanguageTag_ThrowsArgumentException()
     {
-        Assert.Throws<NotSupportedException>(() => new SpellChecker("english"));
+        Assert.Throws<ArgumentException>(() => new SpellChecker("english"));
     }
 
     [Fact]

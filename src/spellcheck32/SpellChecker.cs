@@ -66,6 +66,12 @@ public partial class SpellChecker : IDisposable
     /// <param name="languageTag">
     ///  A BCP47 language tag that identifies the language for the requested spell checker.
     /// </param>
+    /// <exception cref="ArgumentException">
+    ///  Thrown when the specified <paramref name="languageTag"/> is not supported.
+    /// </exception>
+    /// <exception cref="PlatformNotSupportedException">
+    ///  Thrown if the operating system version is less than Windows 8.
+    /// </exception>
     public SpellChecker(string languageTag)
     {
         try
@@ -79,7 +85,7 @@ public partial class SpellChecker : IDisposable
 
             if (!_spellCheckFactory.IsSupported(languageTag))
             {
-                throw new NotSupportedException($"The language tag '{_languageTag}' is not supported.");
+                throw new ArgumentException($"The language tag '{_languageTag}' is not supported.");
             }
 
             _languageTag = languageTag;

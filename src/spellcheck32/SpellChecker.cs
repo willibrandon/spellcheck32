@@ -204,13 +204,11 @@ public partial class SpellChecker : IDisposable
         {
             while (EnumerateSpellingErrors(spellingErrors, out ISpellingError spellingError))
             {
-                yield return new SpellingError()
-                {
-                    CorrectiveAction = (CorrectiveAction)spellingError.CorrectiveAction,
-                    Length = (int)spellingError.Length,
-                    Replacement = spellingError.Replacement.ToString(),
-                    StartIndex = (int)spellingError.StartIndex
-                };
+                yield return new SpellingError(
+                   (CorrectiveAction)spellingError.CorrectiveAction,
+                   (int)spellingError.Length,
+                   spellingError.Replacement.ToString(),
+                   (int)spellingError.StartIndex);
             }
         }
         finally
@@ -234,13 +232,11 @@ public partial class SpellChecker : IDisposable
         {
             while (EnumerateSpellingErrors(spellingErrors, out ISpellingError spellingError))
             {
-                yield return new SpellingError()
-                {
-                    CorrectiveAction = (CorrectiveAction)spellingError.CorrectiveAction,
-                    Length = (int)spellingError.Length,
-                    Replacement = spellingError.Replacement.ToString(),
-                    StartIndex = (int)spellingError.StartIndex
-                };
+                yield return new SpellingError(
+                   (CorrectiveAction)spellingError.CorrectiveAction,
+                   (int)spellingError.Length,
+                   spellingError.Replacement.ToString(),
+                   (int)spellingError.StartIndex);
             }
         }
         finally
